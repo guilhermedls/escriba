@@ -2,12 +2,18 @@ import { google } from "googleapis";
 
 const CACHE_SECONDS = 3600;
 
+let cache: { data: SheetCity[]; expiresAt: number } | null = null;
+
 export interface SheetCity {
   city?: string;
   [key: string]: string | null | undefined;
 }
 
 export async function getSheetDataCached(): Promise<SheetCity[]> {
+  if (cache && Date.now() < cache.expiresAt) {
+    return cache.data;
+  }
+
   const sheetId = process.env.GOOGLE_SHEET_ID;
   const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
@@ -26,7 +32,6 @@ export async function getSheetDataCached(): Promise<SheetCity[]> {
 
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
-    next: { revalidate: CACHE_SECONDS },
   });
 
   if (!response.ok) {
@@ -37,12 +42,18 @@ export async function getSheetDataCached(): Promise<SheetCity[]> {
   const rows: string[][] = json.values || [];
   const [headers, ...data] = rows;
 
-  if (!headers) return [];
+  if (!headers) {
+    cache = { data: [], expiresAt: Date.now() + CACHE_SECONDS * 1000 };
+    return [];
+  }
 
-  return data.map((row) =>
+  const result = data.map((row) =>
     headers.reduce<SheetCity>((acc, header, index) => {
       acc[header] = row[index] ?? null;
       return acc;
-    }, {})
+    }, {}),
   );
+
+  cache = { data: result, expiresAt: Date.now() + CACHE_SECONDS * 1000 };
+  return result;
 }
