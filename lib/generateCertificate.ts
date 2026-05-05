@@ -152,14 +152,14 @@ export async function generateCertificatePDF(
   doc.setFontSize(12.5);
   doc.setTextColor(75, 45, 8);
   const splitVerse = doc.splitTextToSize(
-    `"A tua palavra é lâmpada que ilumina os meus passos\ne luz que clareia o meu caminho."`,
+    `"Quando o justo governa, o povo se alegra; mas quando o ímpio domina, o povo geme."`,
     pw - 60,
   );
   doc.text(splitVerse, pw / 2, verseY, { align: "center" });
   doc.setFont("times", "normal");
   doc.setFontSize(10);
   doc.setTextColor(130, 88, 30);
-  doc.text("Salmos 119:105", pw / 2, verseY + splitVerse.length * 7 + 3, {
+  doc.text("Provérbios 29:2", pw / 2, verseY + splitVerse.length * 7 + 3, {
     align: "center",
   });
 
