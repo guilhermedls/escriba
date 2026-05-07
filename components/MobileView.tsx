@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import type { SoldCitiesMap, CityIndex, SoldCitiesDataMap, SoldCityData } from "./Map";
 import CertificateModal from "./CertificateModal";
+import { PURCHASE_URL } from "@/lib/constants";
 
 interface SearchResult {
     name: string;
@@ -114,6 +116,9 @@ export default function MobileView({
 
             {/* ── Header ── */}
             <header className="mobile-header">
+                <div className="sidebar-logo-wrap">
+                    <Image src="/api/logo" alt="O Escriba da Bíblia" width={80} height={80} className="sidebar-logo" />
+                </div>
                 <div className="mobile-ornament">— ✦ —</div>
                 <h1 className="mobile-title">O Livro das Cidades</h1>
                 <p className="mobile-subtitle">Edição Única · Brasil</p>
@@ -222,7 +227,7 @@ export default function MobileView({
                             : "O exemplar destinado a esta cidade ainda está disponível. Seja o guardião desta história."}
                     </p>
 
-                    {selected.sold && (
+                    {selected.sold ? (
                         <button
                             className="mobile-cert-btn"
                             onClick={() => {
@@ -233,6 +238,15 @@ export default function MobileView({
                         >
                             ⬇ Baixar Certificado
                         </button>
+                    ) : (
+                        <a
+                            href={PURCHASE_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mobile-cert-btn"
+                        >
+                            Adquirir exemplar desta cidade
+                        </a>
                     )}
                 </div>
             )}
