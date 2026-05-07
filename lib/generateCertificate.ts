@@ -90,30 +90,57 @@ export async function generateCertificatePDF(
 
   // ── Título ────────────────────────────────────────────────────────────────
   doc.setFont("times", "bolditalic");
-  doc.setFontSize(26);
+  doc.setFontSize(22);
   doc.setTextColor(60, 35, 5);
-  doc.text("Certificado de Adoção", pw / 2, 60, { align: "center" });
+  doc.text("CERTIFICADO DE ADOÇÃO", pw / 2, 56, { align: "center" });
+  doc.setFont("times", "bold");
+  doc.setFontSize(13);
+  doc.setTextColor(140, 90, 20);
+  doc.text("PROJETO GEO BÍBLIA", pw / 2, 65, { align: "center" });
   doc.setFont("times", "italic");
-  doc.setFontSize(11);
+  doc.setFontSize(10);
+  doc.setTextColor(110, 75, 25);
+  doc.text("Cada cidade, uma Palavra de Deus", pw / 2, 72, {
+    align: "center",
+  });
+
+  // ── Texto do certificado ──────────────────────────────────────────────────
+  doc.setFont("times", "normal");
+  doc.setFontSize(10.5);
+  doc.setTextColor(45, 28, 5);
+  const lineH = 5.5;
+  const textW = pw - 50;
+  let currentY = 81;
+
+  const para1 = `Certificamos que o município de ${data.city.toUpperCase()} — ${data.uf.toUpperCase()} foi oficialmente adotado no Projeto Geo Bíblia, recebendo uma passagem das Sagradas Escrituras dedicada à sua terra, ao seu povo e às futuras gerações.`;
+  const splitPara1 = doc.splitTextToSize(para1, textW);
+  doc.text(splitPara1, pw / 2, currentY, { align: "center" });
+  currentY += splitPara1.length * lineH + 4;
+
+  const para2 = `Declaramos, ainda, que o portador deste certificado é reconhecido como Embaixador desta cidade no projeto, sendo o único representante a integrar esta iniciativa em âmbito nacional, assumindo o compromisso de preservar, representar e honrar a Palavra de Deus vinculada ao seu município.`;
+  const splitPara2 = doc.splitTextToSize(para2, textW);
+  doc.text(splitPara2, pw / 2, currentY, { align: "center" });
+  currentY += splitPara2.length * lineH + 4;
+
+  const para3 = `Ao adquirir o exemplar numerado e exclusivo da Bíblia das Cidades, torna-se guardião de um registro espiritual e histórico, eternizado como parte desta obra que une fé, território e propósito.`;
+  const splitPara3 = doc.splitTextToSize(para3, textW);
+  doc.text(splitPara3, pw / 2, currentY, { align: "center" });
+  currentY += splitPara3.length * lineH + 5;
+
+  doc.setFont("times", "bolditalic");
+  doc.setFontSize(10);
   doc.setTextColor(110, 75, 25);
   doc.text(
-    "Projeto Geo Bíblia — cada cidade, uma Palavra de Deus",
+    "Uma cidade. Um representante. Uma Palavra eterna.",
     pw / 2,
-    68,
+    currentY,
     { align: "center" },
   );
-
-  // ── Texto introdutório ────────────────────────────────────────────────────
-  doc.setFont("times", "normal");
-  doc.setFontSize(12);
-  doc.setTextColor(45, 28, 5);
-  const intro = `Este certificado atesta que o município de ${data.city.toUpperCase()} — ${data.uf.toUpperCase()} foi adotado no Projeto Geo Bíblia, recebendo uma passagem das Sagradas Escrituras dedicada à sua gente, sua história e seu futuro.`;
-  const splitIntro = doc.splitTextToSize(intro, pw - 52);
-  doc.text(splitIntro, pw / 2, 82, { align: "center" });
+  currentY += lineH;
 
   // ── Caixa de dados ────────────────────────────────────────────────────────
-  const boxTop = 82 + splitIntro.length * 7 + 8;
-  const boxH = 58;
+  const boxTop = currentY + 7;
+  const boxH = 46;
   const boxL = 28;
   const boxW = pw - 56;
   doc.setFillColor(180, 140, 70);
@@ -126,7 +153,7 @@ export async function generateCertificatePDF(
   doc.setLineWidth(0.3);
   doc.line(boxL + 8, boxTop + 11, boxL + boxW - 8, boxTop + 11);
 
-  let rowY = boxTop + 18;
+  let rowY = boxTop + 15;
   (
     [
       ["Município:", `${data.city} — ${data.uf.toUpperCase()}`],
@@ -143,35 +170,18 @@ export async function generateCertificatePDF(
     doc.setFontSize(11);
     doc.setTextColor(35, 20, 3);
     doc.text(value, boxL + 55, rowY);
-    rowY += 11.5;
-  });
-
-  // ── Versículo em destaque ─────────────────────────────────────────────────
-  const verseY = boxTop + boxH + 18;
-  doc.setFont("times", "italic");
-  doc.setFontSize(12.5);
-  doc.setTextColor(75, 45, 8);
-  const splitVerse = doc.splitTextToSize(
-    `"Quando o justo governa, o povo se alegra; mas quando o ímpio domina, o povo geme."`,
-    pw - 60,
-  );
-  doc.text(splitVerse, pw / 2, verseY, { align: "center" });
-  doc.setFont("times", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(130, 88, 30);
-  doc.text("Provérbios 29:2", pw / 2, verseY + splitVerse.length * 7 + 3, {
-    align: "center",
+    rowY += 9;
   });
 
   // ── Seção QR Code de verificação ──────────────────────────────────────────
-  const qrSectionY = verseY + splitVerse.length * 7 + 18;
-  const qrSize = 28; // mm
+  const qrSectionY = boxTop + boxH + 6;
+  const qrSize = 22; // mm
   const qrX = pw / 2 - qrSize / 2;
 
   // Caixinha larga o suficiente para o título e a legenda
   const boxQrW = 80;
   const boxQrX = pw / 2 - boxQrW / 2;
-  const boxQrH = qrSize + 22;
+  const boxQrH = qrSize + 20;
 
   doc.setFillColor(254, 249, 237);
   doc.setDrawColor(160, 115, 45);
