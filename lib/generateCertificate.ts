@@ -90,45 +90,45 @@ export async function generateCertificatePDF(
 
   // ── Título ────────────────────────────────────────────────────────────────
   doc.setFont("times", "bolditalic");
-  doc.setFontSize(22);
+  doc.setFontSize(20);
   doc.setTextColor(60, 35, 5);
-  doc.text("CERTIFICADO DE ADOÇÃO", pw / 2, 56, { align: "center" });
+  doc.text("CERTIFICADO DE ADOÇÃO", pw / 2, 54, { align: "center" });
   doc.setFont("times", "bold");
-  doc.setFontSize(13);
+  doc.setFontSize(12);
   doc.setTextColor(140, 90, 20);
-  doc.text("PROJETO GEO BÍBLIA", pw / 2, 65, { align: "center" });
+  doc.text("PROJETO GEO BÍBLIA", pw / 2, 62, { align: "center" });
   doc.setFont("times", "italic");
-  doc.setFontSize(10);
+  doc.setFontSize(9.5);
   doc.setTextColor(110, 75, 25);
-  doc.text("Cada cidade, uma Palavra de Deus", pw / 2, 72, {
+  doc.text("Cada cidade, uma Palavra de Deus", pw / 2, 69, {
     align: "center",
   });
 
   // ── Texto do certificado ──────────────────────────────────────────────────
   doc.setFont("times", "normal");
-  doc.setFontSize(10.5);
+  doc.setFontSize(9.5);
   doc.setTextColor(45, 28, 5);
   const lineH = 5.5;
-  const textW = pw - 50;
-  let currentY = 81;
+  const textW = pw - 44;
+  let currentY = 77;
 
   const para1 = `Certificamos que o município de ${data.city.toUpperCase()} — ${data.uf.toUpperCase()} foi oficialmente adotado no Projeto Geo Bíblia, recebendo uma passagem das Sagradas Escrituras dedicada à sua terra, ao seu povo e às futuras gerações.`;
   const splitPara1 = doc.splitTextToSize(para1, textW);
   doc.text(splitPara1, pw / 2, currentY, { align: "center" });
-  currentY += splitPara1.length * lineH + 4;
+  currentY += splitPara1.length * lineH + 3;
 
   const para2 = `Declaramos, ainda, que o portador deste certificado é reconhecido como Embaixador desta cidade no projeto, sendo o único representante a integrar esta iniciativa em âmbito nacional, assumindo o compromisso de preservar, representar e honrar a Palavra de Deus vinculada ao seu município.`;
   const splitPara2 = doc.splitTextToSize(para2, textW);
   doc.text(splitPara2, pw / 2, currentY, { align: "center" });
-  currentY += splitPara2.length * lineH + 4;
+  currentY += splitPara2.length * lineH + 3;
 
   const para3 = `Ao adquirir o exemplar numerado e exclusivo da Bíblia das Cidades, torna-se guardião de um registro espiritual e histórico, eternizado como parte desta obra que une fé, território e propósito.`;
   const splitPara3 = doc.splitTextToSize(para3, textW);
   doc.text(splitPara3, pw / 2, currentY, { align: "center" });
-  currentY += splitPara3.length * lineH + 5;
+  currentY += splitPara3.length * lineH + 4;
 
   doc.setFont("times", "bolditalic");
-  doc.setFontSize(10);
+  doc.setFontSize(9.5);
   doc.setTextColor(110, 75, 25);
   doc.text(
     "Uma cidade. Um representante. Uma Palavra eterna.",
@@ -139,7 +139,7 @@ export async function generateCertificatePDF(
   currentY += lineH;
 
   // ── Caixa de dados ────────────────────────────────────────────────────────
-  const boxTop = currentY + 7;
+  const boxTop = currentY + 6;
   const boxH = 46;
   const boxL = 28;
   const boxW = pw - 56;
@@ -151,9 +151,9 @@ export async function generateCertificatePDF(
   doc.roundedRect(boxL, boxTop, boxW, boxH, 4, 4, "FD");
   doc.setDrawColor(200, 160, 80);
   doc.setLineWidth(0.3);
-  doc.line(boxL + 8, boxTop + 11, boxL + boxW - 8, boxTop + 11);
+  doc.line(boxL + 8, boxTop + 8, boxL + boxW - 8, boxTop + 8);
 
-  let rowY = boxTop + 15;
+  let rowY = boxTop + 17;
   (
     [
       ["Município:", `${data.city} — ${data.uf.toUpperCase()}`],
@@ -170,18 +170,18 @@ export async function generateCertificatePDF(
     doc.setFontSize(11);
     doc.setTextColor(35, 20, 3);
     doc.text(value, boxL + 55, rowY);
-    rowY += 9;
+    rowY += 8;
   });
 
   // ── Seção QR Code de verificação ──────────────────────────────────────────
-  const qrSectionY = boxTop + boxH + 6;
-  const qrSize = 22; // mm
+  const qrSectionY = boxTop + boxH + 30;
+  const qrSize = 20; // mm
   const qrX = pw / 2 - qrSize / 2;
 
   // Caixinha larga o suficiente para o título e a legenda
   const boxQrW = 80;
   const boxQrX = pw / 2 - boxQrW / 2;
-  const boxQrH = qrSize + 20;
+  const boxQrH = qrSize + 26;
 
   doc.setFillColor(254, 249, 237);
   doc.setDrawColor(160, 115, 45);
