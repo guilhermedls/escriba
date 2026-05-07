@@ -2,12 +2,62 @@
 import type { CertificateData } from "@/components/CertificateModal";
 export type { CertificateData };
 
-const BASE_URL = "https://mapa.oescribadabiblia.com.br";
+import { BASE_URL } from "@/lib/constants";
 
 /**
  * Gera uma Data URL de QR code usando a lib `qrcode`.
  * O QR aponta para a página de verificação do certificado no site.
  */
+async function getLogoDataURL(): Promise<string | null> {
+  try {
+    const res = await fetch("/api/logo");
+    const blob = await res.blob();
+    const objectURL = URL.createObjectURL(blob);
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const size = Math.min(img.width, img.height);
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d")!;
+
+        // Desenha a imagem completa num canvas auxiliar para ler os pixels
+        const tmp = document.createElement("canvas");
+        tmp.width = img.width;
+        tmp.height = img.height;
+        const tctx = tmp.getContext("2d")!;
+        tctx.drawImage(img, 0, 0);
+
+        // Remove pixels brancos/quase-brancos (threshold 230)
+        const imageData = tctx.getImageData(0, 0, img.width, img.height);
+        const d = imageData.data;
+        for (let i = 0; i < d.length; i += 4) {
+          if (d[i] >= 230 && d[i + 1] >= 230 && d[i + 2] >= 230) {
+            d[i + 3] = 0;
+          }
+        }
+        tctx.putImageData(imageData, 0, 0);
+
+        // Recorta em círculo
+        ctx.beginPath();
+        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        const offsetX = (img.width - size) / 2;
+        const offsetY = (img.height - size) / 2;
+        ctx.drawImage(tmp, -offsetX, -offsetY);
+        URL.revokeObjectURL(objectURL);
+        resolve(canvas.toDataURL("image/png"));
+      };
+      img.onerror = () => { URL.revokeObjectURL(objectURL); resolve(null); };
+      img.src = objectURL;
+    });
+  } catch {
+    return null;
+  }
+}
+
 async function generateQRCodeDataURL(text: string): Promise<string> {
   const QRCode = (await import("qrcode")).default;
   return QRCode.toDataURL(text, {
@@ -47,8 +97,11 @@ export async function generateCertificatePDF(
     creator: "oescribadabiblia.com.br",
   });
 
-  // Gerar QR code antes de montar o PDF
-  const qrDataURL = await generateQRCodeDataURL(verifyURL);
+  // Gerar QR code e logo antes de montar o PDF
+  const [qrDataURL, logoDataURL] = await Promise.all([
+    generateQRCodeDataURL(verifyURL),
+    getLogoDataURL(),
+  ]);
 
   // ── Fundo pergaminho ──────────────────────────────────────────────────────
   doc.setFillColor(247, 242, 230);
@@ -70,37 +123,41 @@ export async function generateCertificatePDF(
   doc.text("†", pw - 16, ph - 16, { align: "right" });
 
   // ── Cabeçalho ─────────────────────────────────────────────────────────────
+  if (logoDataURL) {
+    const logoSize = 14;
+    doc.addImage(logoDataURL, "PNG", pw / 2 - logoSize / 2, 16, logoSize, logoSize);
+  }
   doc.setFont("times", "bold");
   doc.setFontSize(10);
   doc.setTextColor(100, 65, 15);
-  doc.text("O ESCRIBA DA BÍBLIA", pw / 2, 30, { align: "center" });
+  doc.text("O ESCRIBA DA BÍBLIA", pw / 2, 34, { align: "center" });
   doc.setFont("times", "normal");
   doc.setFontSize(8);
   doc.setTextColor(140, 100, 40);
-  doc.text("mapa.oescribadabiblia.com.br", pw / 2, 36, { align: "center" });
+  doc.text("mapa.oescribadabiblia.com.br", pw / 2, 40, { align: "center" });
 
   // ── Linhas decorativas ────────────────────────────────────────────────────
   doc.setDrawColor(160, 115, 45);
   doc.setLineWidth(0.3);
-  doc.line(28, 40, pw - 28, 40);
+  doc.line(28, 45, pw - 28, 45);
   doc.setLineWidth(0.8);
-  doc.line(35, 42, pw - 35, 42);
+  doc.line(35, 47, pw - 35, 47);
   doc.setLineWidth(0.3);
-  doc.line(28, 44, pw - 28, 44);
+  doc.line(28, 49, pw - 28, 49);
 
   // ── Título ────────────────────────────────────────────────────────────────
   doc.setFont("times", "bolditalic");
   doc.setFontSize(20);
   doc.setTextColor(60, 35, 5);
-  doc.text("CERTIFICADO DE ADOÇÃO", pw / 2, 54, { align: "center" });
+  doc.text("CERTIFICADO DE ADOÇÃO", pw / 2, 60, { align: "center" });
   doc.setFont("times", "bold");
   doc.setFontSize(12);
   doc.setTextColor(140, 90, 20);
-  doc.text("PROJETO GEO BÍBLIA", pw / 2, 62, { align: "center" });
+  doc.text("PROJETO GEO BÍBLIA", pw / 2, 69, { align: "center" });
   doc.setFont("times", "italic");
   doc.setFontSize(9.5);
   doc.setTextColor(110, 75, 25);
-  doc.text("Cada cidade, uma Palavra de Deus", pw / 2, 69, {
+  doc.text("Cada cidade, uma Palavra de Deus", pw / 2, 76, {
     align: "center",
   });
 
@@ -110,7 +167,7 @@ export async function generateCertificatePDF(
   doc.setTextColor(45, 28, 5);
   const lineH = 5.5;
   const textW = pw - 44;
-  let currentY = 77;
+  let currentY = 84;
 
   const para1 = `Certificamos que o município de ${data.city.toUpperCase()} — ${data.uf.toUpperCase()} foi oficialmente adotado no Projeto Geo Bíblia, recebendo uma passagem das Sagradas Escrituras dedicada à sua terra, ao seu povo e às futuras gerações.`;
   const splitPara1 = doc.splitTextToSize(para1, textW);

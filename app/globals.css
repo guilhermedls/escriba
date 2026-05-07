@@ -61,6 +61,18 @@ body {
   pointer-events: none;
 }
 
+.sidebar-logo-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.sidebar-logo {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--gold);
+}
+
 .sidebar-ornament {
   font-size: 1.1rem;
   color: var(--gold);

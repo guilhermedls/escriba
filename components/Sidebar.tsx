@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 interface SidebarProps {
     currentState: string | null;
     totalCities: number;
@@ -15,6 +17,9 @@ export default function Sidebar({
 }: SidebarProps) {
     return (
         <aside className="sidebar">
+            <div className="sidebar-logo-wrap">
+                <Image src="/api/logo" alt="O Escriba da Bíblia" width={80} height={80} className="sidebar-logo" />
+            </div>
             <div className="sidebar-ornament">— ✦ —</div>
             <h1 className="sidebar-title">O Livro das Cidades</h1>
             <p className="sidebar-subtitle">Edição Única · Brasil</p>

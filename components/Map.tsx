@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import { PURCHASE_URL } from "@/lib/constants";
 import {
     ComposableMap,
     Geographies,
@@ -173,6 +174,8 @@ export default function MapChart({ soldCities = {}, soldCitiesData = {}, cityInd
         if (isSold && onSoldCityClick) {
             const data = soldCitiesData[`${name}_${uf}`];
             if (data) onSoldCityClick(data);
+        } else if (!isSold) {
+            window.open(PURCHASE_URL, "_blank", "noopener,noreferrer");
         }
     };
 
@@ -342,11 +345,11 @@ export default function MapChart({ soldCities = {}, soldCitiesData = {}, cityInd
                                                     outline: "none",
                                                     stroke: isHighlighted ? "#8a6d20" : "#1a3a2a",
                                                     strokeWidth: isStateView ? 0.15 : 0.5,
-                                                    cursor: isStateView ? (isSold ? "pointer" : "default") : "pointer",
+                                                    cursor: "pointer",
                                                     transition: "fill 0.15s ease",
                                                     filter: isHighlighted ? "drop-shadow(0 0 5px rgba(184,150,62,0.9))" : "none",
                                                 },
-                                                hover: { fill: fillColor, outline: "none", stroke: "#0f2419", strokeWidth: isStateView ? 0.2 : 0.7, cursor: isStateView ? (isSold ? "pointer" : "default") : "pointer" },
+                                                hover: { fill: fillColor, outline: "none", stroke: "#0f2419", strokeWidth: isStateView ? 0.2 : 0.7, cursor: "pointer" },
                                                 pressed: { fill: "#1a5c3a", outline: "none" },
                                             }}
                                         />
