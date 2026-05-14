@@ -21,6 +21,8 @@ const MapChart = dynamic(() => import("../components/Map"), {
 
 const TOTAL_CITIES = 5570;
 
+const CLIENT_PAID = false;
+
 export default function Home() {
   const isMobile = useIsMobile();
   const [currentState, setCurrentState] = useState<string | null>(null);
@@ -72,6 +74,10 @@ export default function Home() {
 
   const soldCount = Object.values(soldCities).filter(Boolean).length;
   const availableCount = TOTAL_CITIES - soldCount;
+
+  if (!CLIENT_PAID) {
+    return <div style={{ width: "100vw", height: "100vh", background: "#fff" }} />;
+  }
 
   if (isMobile === null || !sheetsLoaded) {
     return (
