@@ -21,7 +21,7 @@ const MapChart = dynamic(() => import("../components/Map"), {
 
 const TOTAL_CITIES = 5570;
 
-const CLIENT_PAID = false;
+const CLIENT_PAID = true;
 
 export default function Home() {
   const isMobile = useIsMobile();
